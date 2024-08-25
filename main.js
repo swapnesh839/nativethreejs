@@ -22,14 +22,42 @@ const textureloader = new THREE.TextureLoader
 // scene.add(sphere)
 
 
-const planematerial = new THREE.MeshBasicMaterial({
-  color:"purple",
-  side:THREE.DoubleSide
-})
-const planegeometry = new THREE.PlaneGeometry(1,1)
-const planetexture = textureloader.load("https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg?auto=compress&cs=tinysrgb&w=400") 
-const plane = new THREE.Mesh(planegeometry,planematerial)
-scene.add(plane)
+// const planematerial = new THREE.MeshBasicMaterial({
+//   color:"purple",
+//   side:THREE.DoubleSide
+// })
+// const planegeometry = new THREE.PlaneGeometry(1,1)
+// const planetexture = textureloader.load("https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg?auto=compress&cs=tinysrgb&w=400") 
+// const plane = new THREE.Mesh(planegeometry,planematerial)
+// scene.add(plane)
+textureloader.load(
+  "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg?auto=compress&cs=tinysrgb&w=400",
+  (texture) => {
+    const planematerial = new THREE.MeshStandardMaterial({
+      map: texture,
+      side: THREE.DoubleSide // Make sure both sides are visible
+    });
+
+    const planegeometry = new THREE.PlaneGeometry(10, 10); // Increased size for visibility
+    const plane = new THREE.Mesh(planegeometry, planematerial);
+
+    // Position the plane directly in front of the camera
+    plane.position.set(0, 0, -10); // Move the plane 10 units in front of the camera
+
+    // Ensure the plane faces the camera
+    plane.rotation.set(0, 0, 0); // No rotation needed
+
+    scene.add(plane);
+
+    // Render the scene after the texture is loaded
+    renderer.render(scene, Camera);
+  },
+  undefined, // onProgress callback (optional)
+  (error) => {
+    console.error('An error occurred while loading the texture:', error);
+  }
+);
+
 
 
 // const point = new THREE.Vector2()
@@ -38,9 +66,8 @@ scene.add(plane)
 
 
 const Camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,.1,1000)
-
-Camera.position.set(-1,1,3)
-Camera.position.x= 1
+Camera.position.set(0,0,3)
+// Camera.position.x= 1
 // Camera.rotateY()
 scene.add(Camera)
 
@@ -49,6 +76,8 @@ const renderer = new THREE.WebGLRenderer({
   canvas:canvas,
   antialias:true
 })
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio)
 // renderer.setClearColor("red")
 const controler = new OrbitControls(Camera,renderer.domElement)
 controler.rotateSpeed=1.3
